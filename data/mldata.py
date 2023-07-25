@@ -42,9 +42,10 @@ class MLData:
     """
 
     X_train: valid_type
-    X_val: Optional[valid_type]
-    X_test: Optional[valid_type]
-
     y_train: valid_type
-    y_val: Optional[valid_type]
-    y_test: Optional[valid_type]
+
+    X_val: Optional[valid_type] = None
+    y_val: Optional[valid_type] = None
+
+    X_test: Optional[valid_type] = None
+    y_test: Optional[valid_type] = None

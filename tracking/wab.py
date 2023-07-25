@@ -9,11 +9,12 @@ from wandb.sdk.artifacts.artifact_manifest_entry import ArtifactManifestEntry
 class WABArtifact(LocalArtifact, ABC):
 
     def __init__(self, name: str, local_path: Union[Path, str]):
-        super().__init__(local_path=local_path)
+        LocalArtifact.__init__(self, local_path=local_path)
         self.name: str = name
         self.artifact = None
         self.tag = None
 
+    @abstractmethod
     def save_wab(self, project_name, tags=('latest',), metadata: Dict = None,
                  depends_on: Union[str, ArtifactManifestEntry, None] = None):
 
@@ -25,7 +26,7 @@ class WABArtifact(LocalArtifact, ABC):
 
         wab_save_run = wandb.init(
             project=project_name,
-            job_type='upload-dataset'
+            job_type='upload-artifact'
         )
 
         self.artifact = wandb.Artifact(
@@ -37,13 +38,13 @@ class WABArtifact(LocalArtifact, ABC):
         self.artifact.add_dir(str(self.local_path))
 
         if depends_on is not None:
-            if not isinstance(depends_on, ArtifactManifestEntry):
+            if not isinstance(depends_on, (str, wandb.Artifact, ArtifactManifestEntry)):
                 raise ValueError("depends_on object has to be wandb ArtifactManifestEntry")
             else:
-                self.artifact.add_reference(depends_on)
+                wab_save_run.use_artifact(depends_on)
 
         wab_save_run.log_artifact(self.artifact, aliases=tags)
-
+        self.artifact.wait()
         wab_save_run.finish()
 
         return self.artifact
