@@ -4,8 +4,10 @@ import wandb
 from pathlib import Path
 from typing import Union, Dict, Iterable
 
-from wandb.sdk.artifacts.public_artifact import Artifact as ArtifactType
+from wandb.sdk.artifacts.public_artifact import Artifact as PublicWandbArtifact
+from wandb.sdk.artifacts.local_artifact import Artifact as LocalWandbArtifact
 
+ArtifactType = Union[PublicWandbArtifact, LocalWandbArtifact]
 
 class WABArtifact(LocalArtifact, ABC):
 
@@ -28,7 +30,7 @@ class WABArtifact(LocalArtifact, ABC):
         if depends_on is not None:
             depends_on = (depends_on,)
             for depend in depends_on:
-                if not isinstance(depend, ArtifactType):
+                if not isinstance(depend, (PublicWandbArtifact, LocalWandbArtifact)):
                     raise ValueError("each dependant object has to be wandb Artifact")
 
         if not self.local_path_used:
