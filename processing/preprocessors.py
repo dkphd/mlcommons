@@ -20,6 +20,9 @@ class DataframeTransformerWrapper(TransformerMixin):
         X[:] = self.transformer.transform(X)
         return X
 
+    def get_params(self):
+        return self.transformer.get_params()
+
 
 class CorrelationFilter(TransformerMixin):
 
