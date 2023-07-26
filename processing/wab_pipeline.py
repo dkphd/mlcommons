@@ -9,11 +9,11 @@ from gems.io import Pickle
 import wandb
 
 
-class WABPipeline(WABArtifact, Pipeline):
+class WABPipeline(Pipeline, WABArtifact):
 
     def __init__(self, steps, name: str, local_path: Union[Path, str], *, memory=None, verbose=False):
-        Pipeline.__init__(self, steps, memory=memory, verbose=verbose)
         WABArtifact.__init__(self, name, local_path)
+        Pipeline.__init__(self, steps, memory=memory, verbose=verbose)
 
     def save(self):
         Pickle.save(self.local_path / f'pipeline.pkl', self)
