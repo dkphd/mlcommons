@@ -3,8 +3,6 @@ from data.local_artifact import LocalArtifact
 import wandb
 from pathlib import Path
 from typing import Union, Dict
-from wandb.sdk.artifacts.artifact_manifest_entry import ArtifactManifestEntry
-
 
 class WABArtifact(LocalArtifact, ABC):
 
@@ -16,7 +14,7 @@ class WABArtifact(LocalArtifact, ABC):
 
     @abstractmethod
     def save_wab(self, project_name, tags=('latest',), metadata: Dict = None,
-                 depends_on: Union[str, ArtifactManifestEntry, None] = None):
+                 depends_on: wandb.Artifact = None, job_type="upload-artifact"):
 
         if not self.local_path_used:
             print("Warning: local path was not used to load or save artifact locally")
@@ -26,7 +24,7 @@ class WABArtifact(LocalArtifact, ABC):
 
         wab_save_run = wandb.init(
             project=project_name,
-            job_type='upload-artifact'
+            job_type=job_type
         )
 
         self.artifact = wandb.Artifact(
@@ -38,8 +36,8 @@ class WABArtifact(LocalArtifact, ABC):
         self.artifact.add_dir(str(self.local_path))
 
         if depends_on is not None:
-            if not isinstance(depends_on, (str, wandb.Artifact, ArtifactManifestEntry)):
-                raise ValueError("depends_on object has to be wandb ArtifactManifestEntry")
+            if not isinstance(depends_on, wandb.Artifact):
+                raise ValueError("depends_on object has to be wandb Artifact")
             else:
                 wab_save_run.use_artifact(depends_on)
 
@@ -51,10 +49,10 @@ class WABArtifact(LocalArtifact, ABC):
 
     @staticmethod
     @abstractmethod
-    def load_wab(project_name, artifact_name, tag='latest'):
+    def load_wab(project_name, artifact_name, tag='latest', job_type="download-artifact"):
         run = wandb.init(
             project=project_name,
-            job_type='download-artifact'
+            job_type=job_type
         )
 
         artifact = run.use_artifact(f'{project_name}/{artifact_name}:{tag}')
