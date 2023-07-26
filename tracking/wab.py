@@ -28,7 +28,8 @@ class WABArtifact(LocalArtifact, ABC):
                              " the name of the artifact is not known, set the name first")
 
         if depends_on is not None:
-            depends_on = tuple(depends_on)
+            if not hasattr(depends_on, "__iter__"):
+                depends_on = (depends_on,)
             for depend in depends_on:
                 if not isinstance(depend, (PublicWandbArtifact, LocalWandbArtifact)):
                     raise ValueError(f"each dependant object has to be wandb Artifact but it is {type(depend)}")
