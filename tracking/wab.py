@@ -1,5 +1,5 @@
 from abc import abstractmethod, ABC
-from data.local_artifact import LocalArtifact
+from ..data.local_artifact import LocalArtifact
 import wandb
 from pathlib import Path
 from typing import Union, Dict
