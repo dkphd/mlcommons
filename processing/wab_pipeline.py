@@ -1,7 +1,7 @@
 from sklearn.pipeline import Pipeline
-from tracking.wab import WABArtifact, ArtifactManifestEntry
+from ..tracking.wab import WABArtifact
 
-from typing import Union, Dict
+from typing import Union, Dict, Optional
 from pathlib import Path
 
 from gems.io import Pickle
@@ -20,21 +20,22 @@ class WABPipeline(WABArtifact, Pipeline):
         self.local_path_used = True
 
     @staticmethod
-    def load_wab(project_name, artifact_name, tag='latest'):
-        artifact, download_path = WABArtifact.load_wab(project_name, artifact_name, tag)
+    def load_wab(project_name, artifact_name, tag='latest', job_type='upload-data_processing_pipeline'):
+        artifact, download_path = WABArtifact.load_wab(project_name, artifact_name, tag, job_type=job_type)
         pipeline = Pickle.load(download_path / f'pipeline.pkl')
         pipeline.artifact = artifact
         return pipeline
 
     def save_wab(self, project_name, tags=('latest',), metadata: Dict = None,
-                 depends_on: Union[str, ArtifactManifestEntry, None] = None):
+                 depends_on:  Optional[wandb.sdk.artifacts.public_artifact.Artifact]= None,
+                 job_type='download-data_processing_pipeline'):
 
         pipeline_config = {'pipeline_steps_config': self._get_pipeline_config()}
 
         if metadata is not None:
             pipeline_config.update(metadata)
 
-        WABArtifact.save_wab(self, project_name, tags, pipeline_config, depends_on)
+        WABArtifact.save_wab(self, project_name, tags, pipeline_config, depends_on, job_type=job_type)
 
     @staticmethod
     def load(path: Union[str, Path]):
