@@ -2,7 +2,10 @@ from abc import abstractmethod, ABC
 from ..data.local_artifact import LocalArtifact
 import wandb
 from pathlib import Path
-from typing import Union, Dict
+from typing import Union, Dict, Iterable
+
+from wandb.sdk.artifacts.public_artifact import Artifact as ArtifactType
+
 
 class WABArtifact(LocalArtifact, ABC):
 
@@ -14,7 +17,8 @@ class WABArtifact(LocalArtifact, ABC):
 
     @abstractmethod
     def save_wab(self, project_name, tags=('latest',), metadata: Dict = None,
-                 depends_on: wandb.sdk.artifacts.public_artifact.Artifact = None, job_type="upload-artifact"):
+                 depends_on: Union[ArtifactType, Iterable[ArtifactType]] = None, job_type="upload-artifact"):
+
 
         if self.name == "LOADED_FROM_LOCAL_STORAGE":
             raise ValueError("Name is automatic (LOADED_FROM_LOCAL_STORAGE), "
@@ -22,8 +26,10 @@ class WABArtifact(LocalArtifact, ABC):
                              " the name of the artifact is not known, set the name first")
 
         if depends_on is not None:
-            if not isinstance(depends_on, wandb.sdk.artifacts.public_artifact.Artifact):
-                raise ValueError("depends_on object has to be wandb Artifact")
+            depends_on = (depends_on,)
+            for depend in depends_on:
+                if not isinstance(depends_on, wandb.sdk.artifacts.public_artifact.Artifact):
+                    raise ValueError("depends_on object has to be wandb Artifact")
 
         if not self.local_path_used:
             print("Warning: local path was not used to load or save artifact locally")
@@ -45,7 +51,8 @@ class WABArtifact(LocalArtifact, ABC):
         self.artifact.add_dir(str(self.local_path))
 
         if depends_on is not None:
-            wab_save_run.use_artifact(depends_on)
+            for depend in depends_on:
+                wab_save_run.use_artifact(depend)
 
         wab_save_run.log_artifact(self.artifact, aliases=tags)
         print("Waiting for artifact to finish uploading")

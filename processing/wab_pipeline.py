@@ -1,12 +1,10 @@
 from sklearn.pipeline import Pipeline
-from ..tracking.wab import WABArtifact
+from ..tracking.wab import WABArtifact, ArtifactType
 
-from typing import Union, Dict, Optional
+from typing import Union, Dict, Optional, Iterable
 from pathlib import Path
 
 from gems.io import Pickle
-
-import wandb
 
 
 class WABPipeline(Pipeline, WABArtifact):
@@ -27,7 +25,7 @@ class WABPipeline(Pipeline, WABArtifact):
         return pipeline
 
     def save_wab(self, project_name, tags=('latest',), metadata: Dict = None,
-                 depends_on:  Optional[wandb.sdk.artifacts.public_artifact.Artifact]= None,
+                 depends_on:  Union[ArtifactType, Iterable[ArtifactType]] = None,
                  job_type='download-data_processing_pipeline'):
 
         pipeline_config = {'pipeline_steps_config': self._get_pipeline_config()}
