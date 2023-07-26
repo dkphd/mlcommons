@@ -18,7 +18,7 @@ class WABPipeline(Pipeline, WABArtifact):
         self.local_path_used = True
 
     @staticmethod
-    def load_wab(project_name, artifact_name, tag='latest', job_type='upload-data_processing_pipeline'):
+    def load_wab(project_name, artifact_name, tag='latest', job_type='download-data_processing_pipeline'):
         artifact, download_path = WABArtifact.load_wab(project_name, artifact_name, tag, job_type=job_type)
         pipeline = Pickle.load(download_path / f'pipeline.pkl')
         pipeline.artifact = artifact
@@ -26,7 +26,7 @@ class WABPipeline(Pipeline, WABArtifact):
 
     def save_wab(self, project_name, tags=('latest',), metadata: Dict = None,
                  depends_on:  Union[ArtifactType, Iterable[ArtifactType]] = None,
-                 job_type='download-data_processing_pipeline'):
+                 job_type='upload-data_processing_pipeline'):
 
         pipeline_config = {'pipeline_steps_config': self._get_pipeline_config()}
 

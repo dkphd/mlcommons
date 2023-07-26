@@ -28,8 +28,8 @@ class WABArtifact(LocalArtifact, ABC):
         if depends_on is not None:
             depends_on = (depends_on,)
             for depend in depends_on:
-                if not isinstance(depends_on, wandb.sdk.artifacts.public_artifact.Artifact):
-                    raise ValueError("depends_on object has to be wandb Artifact")
+                if not isinstance(depend, ArtifactType):
+                    raise ValueError("each dependant object has to be wandb Artifact")
 
         if not self.local_path_used:
             print("Warning: local path was not used to load or save artifact locally")
