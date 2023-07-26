@@ -31,7 +31,7 @@ class WABArtifact(LocalArtifact, ABC):
             depends_on = (depends_on,)
             for depend in depends_on:
                 if not isinstance(depend, (PublicWandbArtifact, LocalWandbArtifact)):
-                    raise ValueError("each dependant object has to be wandb Artifact")
+                    raise ValueError(f"each dependant object has to be wandb Artifact but it is {type(depend)}")
 
         if not self.local_path_used:
             print("Warning: local path was not used to load or save artifact locally")
