@@ -35,7 +35,7 @@ class CorrelationFilter(TransformerMixin):
         cor_matrix = X.corr().abs()
         print("Selecting features")
         upper_tri = cor_matrix.where(np.triu(np.ones(cor_matrix.shape), k=1).astype(np.bool))
-        self.to_select = X.columns[~upper_tri.apply(lambda x: x.max() > 0.95, axis=0)]
+        self.to_select = X.columns[~upper_tri.apply(lambda x: x.max() > self.correlation, axis=0)]
         return self
 
     def transform(self, X: pd.DataFrame, y=None):
