@@ -42,6 +42,8 @@ class WABArtifact(LocalArtifact, ABC):
                 wab_save_run.use_artifact(depends_on)
 
         wab_save_run.log_artifact(self.artifact, aliases=tags)
+        print("Waiting for artifact to finish uploading")
+        wab_save_run.log({'status':"Waiting for artifact to finish uploading"})
         self.artifact.wait()
         wab_save_run.finish()
 
