@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Union
 from pandas import DataFrame
 from numpy import ndarray
-from gems.dask import LocalRunner
+from gems.dask_utils.local_runner import LocalRunner
 
 class DistributedFeatureExtractor(ABC):
 
