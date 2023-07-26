@@ -16,6 +16,11 @@ class WABArtifact(LocalArtifact, ABC):
     def save_wab(self, project_name, tags=('latest',), metadata: Dict = None,
                  depends_on: wandb.Artifact = None, job_type="upload-artifact"):
 
+        if self.name == "LOADED_FROM_LOCAL_STORAGE":
+            raise ValueError("Name is automatic (LOADED_FROM_LOCAL_STORAGE), "
+                             "which means that the data was loaded from local storage and"
+                             " the name of the artifact is not known, set the name first")
+
         if not self.local_path_used:
             print("Warning: local path was not used to load or save artifact locally")
 
