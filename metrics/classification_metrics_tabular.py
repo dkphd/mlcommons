@@ -118,6 +118,21 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         ax.grid(alpha=0.2)
         return fig, ax
 
+    def calculate_numerical_metrics(self):
+        """
+        Compute and return all numerical metrics for binary classification.
+        """
+        metrics = {
+            'Accuracy': self.accuracy(),
+            'Precision': self.precision(),
+            'Recall': self.recall(),
+            'Specificity': self.specificity(),
+            'F1 Score': self.f1(),
+            'MCC': self.mcc(),
+            'ROC AUC': self.auc_roc(),
+            'Precision Recall AUC': self.precision_recall_auc()
+        }
+        return metrics
 
 class MultiClassClassificationMetrics(BaseClassificationMetrics):
 
@@ -220,6 +235,22 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         ax.grid(alpha=0.2)
         return fig, ax
 
+    def calculate_numerical_metrics(self):
+        """
+        Compute and return all numerical metrics for multiclass classification.
+        """
+        metrics = {
+            'Accuracy': self.accuracy(),
+            'Precision': self.precision(),
+            'Recall': self.recall(),
+            'Specificity': self.specificity(),
+            'F1 Score': self.f1(),
+            'MCC': self.mcc(),
+            'ROC AUC': self.auc_roc(),
+            'Precision Recall AUC': self.precision_recall_auc()
+        }
+        return metrics
+
 
 class MultiLabelClassificationMetrics(BaseClassificationMetrics):
 
@@ -312,3 +343,19 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         ax.legend(loc="best")
         ax.grid(alpha=0.2)
         return fig, ax
+
+    def calculate_numerical_metrics(self):
+        """
+        Compute and return all numerical metrics for multilabel classification.
+        """
+        metrics = {
+            'Accuracy': self.accuracy(),
+            'Precision': self.precision(),
+            'Recall': self.recall(),
+            'Specificity': self.specificity(),
+            'F1 Score': self.f1(),
+            'MCC': self.mcc(),
+            'ROC AUC': self.auc_roc(),
+            'Precision Recall AUC': self.precision_recall_auc()
+        }
+        return metrics
