@@ -186,14 +186,27 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         return fig, ax
 
     def specificity(self):
-        """Compute specificity (True Negative Rate) for multiclass classification"""
+        """
+        Compute specificity (True Negative Rate) for multiclass classification.
+
+        Returns:
+        float: Average specificity across classes.
+        """
         cm = confusion_matrix(self.y_true, self.y_pred)
-        FP = cm.sum(axis=0) - np.diag(cm)
-        FN = cm.sum(axis=1) - np.diag(cm)
-        TP = np.diag(cm)
-        TN = cm.sum() - (FP + FN + TP)
-        specificity = TN / (TN + FP)
-        return np.mean(specificity)
+        specificity_list = []
+
+        # Calculate specificity for each class
+        for i in range(cm.shape[0]):
+            tn = np.sum(np.delete(np.delete(cm, i, axis=0), i, axis=1))
+            fp = np.sum(np.delete(cm, i, axis=0)[i])
+
+            # Avoid division by zero
+            if tn + fp == 0:
+                specificity_list.append(0.0)
+            else:
+                specificity_list.append(tn / (tn + fp))
+
+        return np.mean(specificity_list)
 
     def mcc(self):
         """
@@ -281,11 +294,23 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         return roc_auc_score(self.y_true, self.y_prob, average="macro")
 
     def specificity(self):
-        """Compute specificity for each label and average for multilabel classification"""
-        TN = np.logical_and(self.y_pred == 0, self.y_true == 0).sum(axis=0)
-        FP = np.logical_and(self.y_pred == 1, self.y_true == 0).sum(axis=0)
-        specificity = TN / (TN + FP)
-        return np.mean(specificity)
+        """
+        Compute specificity (True Negative Rate) for multilabel classification.
+
+        Returns:
+        list: Specificity for each label.
+        """
+        specificity_list = []
+        for i in range(self.y_true.shape[1]):
+            tn, fp, _, _ = confusion_matrix(self.y_true[:, i], self.y_pred[:, i]).ravel()
+
+            # Avoid division by zero
+            if tn + fp == 0:
+                specificity_list.append(0.0)
+            else:
+                specificity_list.append(tn / (tn + fp))
+
+        return specificity_list
 
     def mcc(self):
         """Compute Matthews Correlation Coefficient for each label and average for multilabel classification"""
