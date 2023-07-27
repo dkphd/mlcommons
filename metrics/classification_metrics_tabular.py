@@ -360,6 +360,24 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
 
         return roc_auc_score(self.y_true, y_prob_array, average="macro")
 
+    def precision_recall_auc(self):
+        """Compute average Precision-Recall AUC for multilabel classification."""
+        if self.y_prob is None:
+            raise ValueError("y_prob is required for Precision-Recall AUC computation.")
+
+        if not isinstance(self.y_prob, list):
+            raise ValueError("Now only output of sklearn estimators is supported!")
+
+        # Convert the list of arrays into a single array with shape (num_samples, num_classes)
+        y_prob_array = np.hstack([arr[:, 1].reshape(-1, 1) for arr in self.y_prob])
+
+        # Ensure the shapes of y_prob_array and y_true are consistent
+        if y_prob_array.shape != self.y_true.shape:
+            raise ValueError(
+                f"Shape mismatch: y_prob_array has shape {y_prob_array.shape} but y_true has shape {self.y_true.shape}.")
+
+        return average_precision_score(self.y_true, y_prob_array, average="macro")
+
     def specificity(self):
         """
         Compute specificity (True Negative Rate) for multilabel classification.
@@ -383,13 +401,6 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         """Compute Matthews Correlation Coefficient for each label and average for multilabel classification"""
         mcc_per_label = [matthews_corrcoef(self.y_true[:, i], self.y_pred[:, i]) for i in range(self.y_true.shape[1])]
         return np.mean(mcc_per_label)
-
-    def precision_recall_auc(self):
-        """
-        Compute average Precision-Recall AUC for multilabel classification.
-        """
-        # For multilabel classification, use average_precision_score directly with macro averaging
-        return average_precision_score(self.y_true, self.y_prob, average="macro")
 
     def plot_roc_auc(self):
         """Return ROC-AUC Curve plot for multilabel classification"""
