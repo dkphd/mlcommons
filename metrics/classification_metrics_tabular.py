@@ -395,7 +395,7 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
             else:
                 specificity_list.append(tn / (tn + fp))
 
-        return specificity_list
+        return np.mean(specificity_list)
 
     def mcc(self):
         """Compute Matthews Correlation Coefficient for each label and average for multilabel classification"""
