@@ -351,7 +351,14 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         """Compute AUC-ROC for multilabel classification"""
         if self.y_prob is None:
             raise ValueError("y_prob is required for AUC-ROC computation.")
-        return roc_auc_score(self.y_true, self.y_prob, average="macro")
+
+        if not isinstance(self.y_prob, list):
+            raise ValueError("Now only output of sklearn estimators is supported!")
+
+        # Convert the list of arrays into a single array with shape (num_samples, num_classes)
+        y_prob_array = np.hstack([arr[:, 1].reshape(-1, 1) for arr in self.y_prob])
+
+        return roc_auc_score(self.y_true, y_prob_array, average="macro")
 
     def specificity(self):
         """
