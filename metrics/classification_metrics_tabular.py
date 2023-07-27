@@ -163,7 +163,7 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         _confusion_matrix, _ = self.plot_confusion_matrix()
 
         result = {
-            f'confusion_matrices{suffix}': _confusion_matrix,
+            f'confusion_matrix{suffix}': _confusion_matrix,
             f'calibration_curve{suffix}': _calibration_curve,
             f'roc_auc_curve{suffix}': _roc_auc_curve,
             f'precision_recall_curve{suffix}': _precision_recall_curve
@@ -324,7 +324,7 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         _confusion_matrix, _ = self.plot_confusion_matrix()
 
         result = {
-            f'confusion_matrices{suffix}': _confusion_matrix,
+            f'confusion_matrix{suffix}': _confusion_matrix,
             f'calibration_curve{suffix}': _calibration_curve,
             f'roc_auc_curve{suffix}': _roc_auc_curve,
             f'precision_recall_curve{suffix}': _precision_recall_curve
