@@ -60,10 +60,18 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         return roc_auc_score(self.y_true, self.y_prob)
 
     def specificity(self):
-        TN = (self.y_pred == 0) & (self.y_true == 0).sum()
-        FP = (self.y_pred == 1) & (self.y_true == 0).sum()
-        specificity = TN / (TN + FP)
-        return specificity
+        """
+        Compute specificity (True Negative Rate) for binary classification.
+
+        Returns:
+        float: specificity.
+        """
+        tn, fp, _, _ = confusion_matrix(self.y_true, self.y_pred).ravel()
+
+        if tn + fp == 0:
+            return 0.0
+
+        return tn / (tn + fp)
 
     def mcc(self):
         """Compute Matthews Correlation Coefficient for binary classification"""
