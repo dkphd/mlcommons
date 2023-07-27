@@ -1,5 +1,6 @@
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, \
-    matthews_corrcoef, roc_curve, confusion_matrix, precision_recall_curve, average_precision_score
+    matthews_corrcoef, roc_curve, confusion_matrix, precision_recall_curve, average_precision_score, \
+    ConfusionMatrixDisplay
 
 from sklearn.calibration import calibration_curve
 from sklearn.preprocessing import label_binarize
@@ -124,6 +125,20 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         ax.set_title("Calibration Curve")
         ax.legend(loc="best")
         ax.grid(alpha=0.2)
+        return fig, ax
+
+    def plot_confusion_matrix_(self):
+        """
+        Visualize the confusion matrix for binary classification using ConfusionMatrixDisplay without grid and colorbar.
+
+        Returns:
+        tuple: Matplotlib figure and axes objects.
+        """
+        cm = self.confusion_matrix()
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ConfusionMatrixDisplay(cm, display_labels=['0', '1']).plot(cmap="Blues", ax=ax, colorbar=False)
+        ax.grid(False)
+        plt.title('Confusion matrix')
         return fig, ax
 
     def calculate_numerical_metrics(self):
