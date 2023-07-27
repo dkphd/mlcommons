@@ -127,7 +127,7 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         ax.grid(alpha=0.2)
         return fig, ax
 
-    def plot_confusion_matrix_(self):
+    def plot_confusion_matrix(self):
         """
         Visualize the confusion matrix for binary classification using ConfusionMatrixDisplay without grid and colorbar.
 
@@ -271,6 +271,20 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         ax.grid(alpha=0.2)
         return fig, ax
 
+    def plot_confusion_matrix(self):
+        """
+        Visualize the confusion matrix for multiclass classification
+
+        Returns:
+        tuple: Matplotlib figure and axes objects.
+        """
+        cm = self.confusion_matrix()
+        fig, ax = plt.subplots(figsize=(6, 6))
+        ConfusionMatrixDisplay(cm, display_labels=['0', '1']).plot(cmap="Blues", ax=ax, colorbar=False)
+        ax.grid(False)
+        plt.title('Confusion matrix')
+        return fig, ax
+
     def calculate_numerical_metrics(self):
         """
         Compute and return all numerical metrics for multiclass classification.
@@ -391,6 +405,38 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         ax.legend(loc="best")
         ax.grid(alpha=0.2)
         return fig, ax
+
+    def plot_confusion_matrices(self):
+        """
+        Visualize the confusion matrices for multilabel classification, one for each label.
+
+        Returns:
+        tuple: Matplotlib figure and axes objects.
+        """
+        cms = self.confusion_matrices()  # List of confusion matrices for each label
+        n_labels = len(cms)
+
+        # Determine grid size based on the number of labels
+        grid_size = int(np.ceil(np.sqrt(n_labels)))
+        fig, axes = plt.subplots(nrows=grid_size, ncols=grid_size, figsize=(15, 15))
+
+        # If only one label, axes is not a list, so we put it in a list for uniform handling
+        if n_labels == 1:
+            axes = [axes]
+
+        # Plot each confusion matrix
+        for i, ax in enumerate(axes.ravel()):
+            if i < n_labels:
+                ConfusionMatrixDisplay(cms[i], display_labels=['0', '1']).plot(cmap="Blues", ax=ax, colorbar=False)
+                ax.set_title(f'Label {i}')
+                ax.grid(False)
+            else:
+                # Turn off axes for extra subplots
+                ax.axis('off')
+
+        plt.suptitle('Confusion matrices for each label', y=1.02)
+        plt.tight_layout()
+        return fig, axes
 
     def calculate_numerical_metrics(self):
         """
