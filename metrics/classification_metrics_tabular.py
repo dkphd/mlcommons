@@ -1,7 +1,8 @@
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, \
-    matthews_corrcoef, roc_curve, confusion_matrix, precision_recall_curve
+    matthews_corrcoef, roc_curve, confusion_matrix, precision_recall_curve, average_precision_score
 
 from sklearn.calibration import calibration_curve
+from sklearn.preprocessing import label_binarize
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -68,6 +69,14 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         """Compute Matthews Correlation Coefficient for binary classification"""
         return matthews_corrcoef(self.y_true, self.y_pred)
 
+    def precision_recall_auc(self):
+        """
+        Compute average Precision-Recall AUC for binary classification.
+        """
+        # For binary classification, use average_precision_score directly
+        return average_precision_score(self.y_true, self.y_prob)
+
+
     def plot_roc_auc(self):
         """Return ROC-AUC Curve plot for binary classification"""
         fig, ax = plt.subplots()
@@ -130,6 +139,14 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
             raise ValueError("y_prob is required for AUC-ROC computation.")
         return roc_auc_score(self.y_true, self.y_prob, average="macro", multi_class="ovr")
 
+    def precision_recall_auc(self):
+        """
+        Compute average Precision-Recall AUC for multiclass classification.
+        """
+        # One-vs-all precision-recall curve for each class and then average the AUC values
+        return average_precision_score(label_binarize(self.y_true, classes=np.unique(self.y_pred)), self.y_prob,
+                                       average="macro")
+
     def plot_roc_auc(self):
         """Return ROC-AUC Curve plot for multiclass classification"""
         fig, ax = plt.subplots()
@@ -145,7 +162,7 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         ax.grid(alpha=0.2)
         return fig, ax
 
-    def specificity_multi_class(self):
+    def specificity(self):
         """Compute specificity (True Negative Rate) for multiclass classification"""
         cm = confusion_matrix(self.y_true, self.y_pred)
         FP = cm.sum(axis=0) - np.diag(cm)
@@ -154,6 +171,19 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         TN = cm.sum() - (FP + FN + TP)
         specificity = TN / (TN + FP)
         return np.mean(specificity)
+
+    def mcc(self):
+        """
+        Compute Matthews Correlation Coefficient for multiclass classification.
+
+        Returns:
+        float: MCC score.
+        """
+        # Flatten the arrays to compute MCC in multiclass scenario
+        y_true_flat = self.y_true.argmax(axis=1)
+        y_pred_flat = self.y_pred.argmax(axis=1)
+
+        return matthews_corrcoef(y_true_flat, y_pred_flat)
 
     def confusion_matrix(self):
         """Compute confusion matrix for multiclass classification"""
@@ -222,6 +252,13 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         """Compute Matthews Correlation Coefficient for each label and average for multilabel classification"""
         mcc_per_label = [matthews_corrcoef(self.y_true[:, i], self.y_pred[:, i]) for i in range(self.y_true.shape[1])]
         return np.mean(mcc_per_label)
+
+    def precision_recall_auc(self):
+        """
+        Compute average Precision-Recall AUC for multilabel classification.
+        """
+        # For multilabel classification, use average_precision_score directly with macro averaging
+        return average_precision_score(self.y_true, self.y_prob, average="macro")
 
     def plot_roc_auc(self):
         """Return ROC-AUC Curve plot for multilabel classification"""
