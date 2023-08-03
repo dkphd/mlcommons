@@ -347,7 +347,7 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         super().__init__(y_true, y_pred, y_prob)
 
         if y_prob is not None:
-            if isintance(self.y_prob, list):
+            if isinstance(self.y_prob, list):
                 self.y_prob = np.hstack([arr[:, 1].reshape(-1, 1) for arr in self.y_prob])
 
             if self.y_prob.shape != self.y_true.shape:
