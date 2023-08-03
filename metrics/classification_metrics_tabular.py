@@ -1,6 +1,16 @@
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, \
-    matthews_corrcoef, roc_curve, confusion_matrix, precision_recall_curve, average_precision_score, \
-    ConfusionMatrixDisplay
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    roc_auc_score,
+    matthews_corrcoef,
+    roc_curve,
+    confusion_matrix,
+    precision_recall_curve,
+    average_precision_score,
+    ConfusionMatrixDisplay,
+)
 
 from sklearn.calibration import calibration_curve
 from sklearn.preprocessing import label_binarize
@@ -41,7 +51,6 @@ class BaseClassificationMetrics:
 
 
 class BinaryClassificationMetrics(BaseClassificationMetrics):
-
     def precision(self):
         """Compute precision for binary classification"""
         return precision_score(self.y_true, self.y_pred)
@@ -135,9 +144,9 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         """
         cm = self.confusion_matrix()
         fig, ax = plt.subplots(figsize=(6, 6))
-        ConfusionMatrixDisplay(cm, display_labels=['0', '1']).plot(cmap="Blues", ax=ax, colorbar=False)
+        ConfusionMatrixDisplay(cm, display_labels=["0", "1"]).plot(cmap="Blues", ax=ax, colorbar=False)
         ax.grid(False)
-        plt.title('Confusion matrix')
+        plt.title("Confusion matrix")
         return fig, ax
 
     def calculate_numerical_metrics(self, suffix=""):
@@ -145,14 +154,14 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         Compute and return all numerical metrics for binary classification.
         """
         metrics = {
-            f'Accuracy{suffix}': self.accuracy(),
-            f'Precision{suffix}': self.precision(),
-            f'Recall{suffix}': self.recall(),
-            f'Specificity{suffix}': self.specificity(),
-            f'F1 Score{suffix}': self.f1(),
-            f'MCC{suffix}': self.mcc(),
-            f'ROC AUC{suffix}': self.auc_roc(),
-            f'Precision Recall AUC{suffix}': self.precision_recall_auc()
+            f"Accuracy{suffix}": self.accuracy(),
+            f"Precision{suffix}": self.precision(),
+            f"Recall{suffix}": self.recall(),
+            f"Specificity{suffix}": self.specificity(),
+            f"F1 Score{suffix}": self.f1(),
+            f"MCC{suffix}": self.mcc(),
+            f"ROC AUC{suffix}": self.auc_roc(),
+            f"Precision Recall AUC{suffix}": self.precision_recall_auc(),
         }
         return metrics
 
@@ -163,17 +172,16 @@ class BinaryClassificationMetrics(BaseClassificationMetrics):
         _confusion_matrix, _ = self.plot_confusion_matrix()
 
         result = {
-            f'confusion_matrix{suffix}': _confusion_matrix,
-            f'calibration_curve{suffix}': _calibration_curve,
-            f'roc_auc_curve{suffix}': _roc_auc_curve,
-            f'precision_recall_curve{suffix}': _precision_recall_curve
+            f"confusion_matrix{suffix}": _confusion_matrix,
+            f"calibration_curve{suffix}": _calibration_curve,
+            f"roc_auc_curve{suffix}": _roc_auc_curve,
+            f"precision_recall_curve{suffix}": _precision_recall_curve,
         }
 
         return result
 
 
 class MultiClassClassificationMetrics(BaseClassificationMetrics):
-
     def precision(self, average_method="macro"):
         """Compute precision for multiclass classification"""
         return precision_score(self.y_true, self.y_pred, average=average_method)
@@ -197,8 +205,9 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         Compute average Precision-Recall AUC for multiclass classification.
         """
         # One-vs-all precision-recall curve for each class and then average the AUC values
-        return average_precision_score(label_binarize(self.y_true, classes=np.unique(self.y_pred)), self.y_prob,
-                                       average="macro")
+        return average_precision_score(
+            label_binarize(self.y_true, classes=np.unique(self.y_pred)), self.y_prob, average="macro"
+        )
 
     def plot_roc_auc(self):
         """Return ROC-AUC Curve plot for multiclass classification"""
@@ -206,7 +215,7 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         n_classes = len(np.unique(self.y_true))
         for i in range(n_classes):
             fpr, tpr, _ = roc_curve((self.y_true == i).astype(int), self.y_prob[:, i])
-            ax.plot(fpr, tpr, lw=2, label=f'Class {i}')
+            ax.plot(fpr, tpr, lw=2, label=f"Class {i}")
 
         ax.set_xlabel("False Positive Rate")
         ax.set_ylabel("True Positive Rate")
@@ -261,7 +270,7 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         n_classes = len(np.unique(self.y_true))
         for i in range(n_classes):
             precision, recall, _ = precision_recall_curve((self.y_true == i).astype(int), self.y_prob[:, i])
-            ax.plot(recall, precision, lw=2, label=f'Class {i}')
+            ax.plot(recall, precision, lw=2, label=f"Class {i}")
         ax.set_xlabel("Recall")
         ax.set_ylabel("Precision")
         ax.set_title("Precision-Recall Curve")
@@ -274,9 +283,10 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         fig, ax = plt.subplots()
         n_classes = len(np.unique(self.y_true))
         for i in range(n_classes):
-            fraction_of_positives, mean_predicted_value = calibration_curve(self.y_true == i, self.y_prob[:, i],
-                                                                            n_bins=10)
-            ax.plot(mean_predicted_value, fraction_of_positives, "s-", label=f'Class {i}')
+            fraction_of_positives, mean_predicted_value = calibration_curve(
+                self.y_true == i, self.y_prob[:, i], n_bins=10
+            )
+            ax.plot(mean_predicted_value, fraction_of_positives, "s-", label=f"Class {i}")
 
         ax.plot([0, 1], [0, 1], "k--", label="Perfectly Calibrated")
         ax.set_xlabel("Mean Predicted Probability")
@@ -295,9 +305,9 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         """
         cm = self.confusion_matrix()
         fig, ax = plt.subplots(figsize=(6, 6))
-        ConfusionMatrixDisplay(cm, display_labels=['0', '1']).plot(cmap="Blues", ax=ax, colorbar=False)
+        ConfusionMatrixDisplay(cm, display_labels=["0", "1"]).plot(cmap="Blues", ax=ax, colorbar=False)
         ax.grid(False)
-        plt.title('Confusion matrix')
+        plt.title("Confusion matrix")
         return fig, ax
 
     def calculate_numerical_metrics(self, suffix=""):
@@ -305,35 +315,45 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         Compute and return all numerical metrics for multiclass classification.
         """
         metrics = {
-            f'Accuracy{suffix}': self.accuracy(),
-            f'Precision{suffix}': self.precision(),
-            f'Recall{suffix}': self.recall(),
-            f'Specificity{suffix}': self.specificity(),
-            f'F1 Score{suffix}': self.f1(),
-            f'MCC{suffix}': self.mcc(),
-            f'ROC AUC{suffix}': self.auc_roc(),
-            f'Precision Recall AUC{suffix}': self.precision_recall_auc()
+            f"Accuracy{suffix}": self.accuracy(),
+            f"Precision{suffix}": self.precision(),
+            f"Recall{suffix}": self.recall(),
+            f"Specificity{suffix}": self.specificity(),
+            f"F1 Score{suffix}": self.f1(),
+            f"MCC{suffix}": self.mcc(),
+            f"ROC AUC{suffix}": self.auc_roc(),
+            f"Precision Recall AUC{suffix}": self.precision_recall_auc(),
         }
         return metrics
 
     def create_all_figures(self, suffix=""):
-
         _calibration_curve, _ = self.plot_calibration_curve()
         _roc_auc_curve, _ = self.plot_roc_auc()
         _precision_recall_curve, _ = self.plot_precision_recall_curve()
         _confusion_matrix, _ = self.plot_confusion_matrix()
 
         result = {
-            f'confusion_matrix{suffix}': _confusion_matrix,
-            f'calibration_curve{suffix}': _calibration_curve,
-            f'roc_auc_curve{suffix}': _roc_auc_curve,
-            f'precision_recall_curve{suffix}': _precision_recall_curve
+            f"confusion_matrix{suffix}": _confusion_matrix,
+            f"calibration_curve{suffix}": _calibration_curve,
+            f"roc_auc_curve{suffix}": _roc_auc_curve,
+            f"precision_recall_curve{suffix}": _precision_recall_curve,
         }
 
         return result
 
 
 class MultiLabelClassificationMetrics(BaseClassificationMetrics):
+    def __init__(self, y_true, y_pred, y_prob=None):
+        super().__init__(y_true, y_pred, y_prob)
+
+        if y_prob is not None:
+            if isintance(self.y_prob, list):
+                self.y_prob = np.hstack([arr[:, 1].reshape(-1, 1) for arr in self.y_prob])
+
+            if self.y_prob.shape != self.y_true.shape:
+                raise ValueError(
+                    f"Shape mismatch: y_prob has shape {self.y_prob.shape} but y_true has shape {self.y_true.shape}."
+                )
 
     def precision(self, average_method="macro"):
         """Compute precision for multilabel classification"""
@@ -352,31 +372,14 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         if self.y_prob is None:
             raise ValueError("y_prob is required for AUC-ROC computation.")
 
-        if not isinstance(self.y_prob, list):
-            raise ValueError("Now only output of sklearn estimators is supported!")
-
-        # Convert the list of arrays into a single array with shape (num_samples, num_classes)
-        y_prob_array = np.hstack([arr[:, 1].reshape(-1, 1) for arr in self.y_prob])
-
-        return roc_auc_score(self.y_true, y_prob_array, average="macro")
+        return roc_auc_score(self.y_true, self.y_prob, average="macro")
 
     def precision_recall_auc(self):
         """Compute average Precision-Recall AUC for multilabel classification."""
         if self.y_prob is None:
             raise ValueError("y_prob is required for Precision-Recall AUC computation.")
 
-        if not isinstance(self.y_prob, list):
-            raise ValueError("Now only output of sklearn estimators is supported!")
-
-        # Convert the list of arrays into a single array with shape (num_samples, num_classes)
-        y_prob_array = np.hstack([arr[:, 1].reshape(-1, 1) for arr in self.y_prob])
-
-        # Ensure the shapes of y_prob_array and y_true are consistent
-        if y_prob_array.shape != self.y_true.shape:
-            raise ValueError(
-                f"Shape mismatch: y_prob_array has shape {y_prob_array.shape} but y_true has shape {self.y_true.shape}.")
-
-        return average_precision_score(self.y_true, y_prob_array, average="macro")
+        return average_precision_score(self.y_true, self.y_prob, average="macro")
 
     def specificity(self):
         """
@@ -408,7 +411,7 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         n_classes = self.y_true.shape[1]
         for i in range(n_classes):
             fpr, tpr, _ = roc_curve(self.y_true[:, i], self.y_prob[:, i])
-            ax.plot(fpr, tpr, lw=2, label=f'Label {i}')
+            ax.plot(fpr, tpr, lw=2, label=f"Label {i}")
 
         ax.set_xlabel("False Positive Rate")
         ax.set_ylabel("True Positive Rate")
@@ -423,7 +426,7 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         n_classes = self.y_true.shape[1]
         for i in range(n_classes):
             precision, recall, _ = precision_recall_curve(self.y_true[:, i], self.y_prob[:, i])
-            ax.plot(recall, precision, lw=2, label=f'Label {i}')
+            ax.plot(recall, precision, lw=2, label=f"Label {i}")
 
         ax.set_xlabel("Recall")
         ax.set_ylabel("Precision")
@@ -443,9 +446,10 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         fig, ax = plt.subplots()
         n_classes = self.y_true.shape[1]
         for i in range(n_classes):
-            fraction_of_positives, mean_predicted_value = calibration_curve(self.y_true[:, i], self.y_prob[:, i],
-                                                                            n_bins=10)
-            ax.plot(mean_predicted_value, fraction_of_positives, "s-", label=f'Label {i}')
+            fraction_of_positives, mean_predicted_value = calibration_curve(
+                self.y_true[:, i], self.y_prob[:, i], n_bins=10
+            )
+            ax.plot(mean_predicted_value, fraction_of_positives, "s-", label=f"Label {i}")
 
         ax.plot([0, 1], [0, 1], "k--", label="Perfectly Calibrated")
         ax.set_xlabel("Mean Predicted Probability")
@@ -476,14 +480,14 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         # Plot each confusion matrix
         for i, ax in enumerate(axes.ravel()):
             if i < n_labels:
-                ConfusionMatrixDisplay(cms[i], display_labels=['0', '1']).plot(cmap="Blues", ax=ax, colorbar=False)
-                ax.set_title(f'Label {i}')
+                ConfusionMatrixDisplay(cms[i], display_labels=["0", "1"]).plot(cmap="Blues", ax=ax, colorbar=False)
+                ax.set_title(f"Label {i}")
                 ax.grid(False)
             else:
                 # Turn off axes for extra subplots
-                ax.axis('off')
+                ax.axis("off")
 
-        plt.suptitle('Confusion matrices for each label', y=1.02)
+        plt.suptitle("Confusion matrices for each label", y=1.02)
         plt.tight_layout()
         return fig, axes
 
@@ -492,29 +496,28 @@ class MultiLabelClassificationMetrics(BaseClassificationMetrics):
         Compute and return all numerical metrics for multilabel classification.
         """
         metrics = {
-            f'Accuracy{suffix}': self.accuracy(),
-            f'Precision{suffix}': self.precision(),
-            f'Recall{suffix}': self.recall(),
-            f'Specificity{suffix}': self.specificity(),
-            f'F1 Score{suffix}': self.f1(),
-            f'MCC{suffix}': self.mcc(),
-            f'ROC AUC{suffix}': self.auc_roc(),
-            f'Precision Recall AUC{suffix}': self.precision_recall_auc()
+            f"Accuracy{suffix}": self.accuracy(),
+            f"Precision{suffix}": self.precision(),
+            f"Recall{suffix}": self.recall(),
+            f"Specificity{suffix}": self.specificity(),
+            f"F1 Score{suffix}": self.f1(),
+            f"MCC{suffix}": self.mcc(),
+            f"ROC AUC{suffix}": self.auc_roc(),
+            f"Precision Recall AUC{suffix}": self.precision_recall_auc(),
         }
         return metrics
 
     def create_all_figures(self, suffix=""):
-
         _calibration_curve, _ = self.plot_calibration_curve()
         _roc_auc_curve, _ = self.plot_roc_auc()
         _precision_recall_curve, _ = self.plot_precision_recall_curve()
         _confusion_matrices, _ = self.plot_confusion_matrices()
 
         result = {
-            f'confusion_matrices{suffix}': _confusion_matrices,
-            f'calibration_curve{suffix}': _calibration_curve,
-            f'roc_auc_curve{suffix}': _roc_auc_curve,
-            f'precision_recall_curve{suffix}': _precision_recall_curve
+            f"confusion_matrices{suffix}": _confusion_matrices,
+            f"calibration_curve{suffix}": _calibration_curve,
+            f"roc_auc_curve{suffix}": _roc_auc_curve,
+            f"precision_recall_curve{suffix}": _precision_recall_curve,
         }
 
         return result
