@@ -234,10 +234,9 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         cm = confusion_matrix(self.y_true, self.y_pred)
         specificity_list = []
 
-        # Calculate specificity for each class
         for i in range(cm.shape[0]):
             tn = np.sum(np.delete(np.delete(cm, i, axis=0), i, axis=1))
-            fp = np.sum(np.delete(cm, i, axis=0)[i])
+            fp = np.sum(np.delete(cm, i, axis=0)[:, i])
 
             # Avoid division by zero
             if tn + fp == 0:
