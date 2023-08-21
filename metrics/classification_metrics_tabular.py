@@ -253,11 +253,8 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         Returns:
         float: MCC score.
         """
-        # Flatten the arrays to compute MCC in multiclass scenario
-        y_true_flat = self.y_true.argmax(axis=1)
-        y_pred_flat = self.y_pred.argmax(axis=1)
 
-        return matthews_corrcoef(y_true_flat, y_pred_flat)
+        return matthews_corrcoef(self.y_true, self.y_pred)
 
     def confusion_matrix(self):
         """Compute confusion matrix for multiclass classification"""
