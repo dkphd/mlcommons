@@ -206,7 +206,7 @@ class MultiClassClassificationMetrics(BaseClassificationMetrics):
         """
         # One-vs-all precision-recall curve for each class and then average the AUC values
         return average_precision_score(
-            label_binarize(self.y_true, classes=np.unique(self.y_pred)), self.y_prob, average="macro"
+            label_binarize(self.y_true, classes=np.unique(self.y_true)), self.y_prob, average="macro"
         )
 
     def plot_roc_auc(self):
